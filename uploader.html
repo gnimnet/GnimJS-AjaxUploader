@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Ajax Uploader</title>
+        <style>
+            * {margin:0;padding:0;}
+            body{padding:10px;}
+            h1{font-size:22px;margin:15px 0 5px;}
+            h2{font-size:20px;margin:13px 0 5px;}
+            h3{font-size:18px;margin:11px 0 5px;}
+            h4{font-size:16px;margin:9px 0 5px;}
+            h5{font-size:14px;margin:7px 0 5px;}
+            h6{font-size:12px;margin:5px 0 5px;}
+            p,.line{display:block;padding:5px;}
+            p{line-height:150%;}
+            button{padding:3px;margin:5px;}
+        </style>
+    </head>
+    <body>
+        <h2>上传表单</h2>
+        <div id="form">
+            <div id="uploader"></div>
+            <div id="buttons"></div>
+        </div>
+        <script src="https://raw.github.com/RockMing/GnimJS/master/full/gnim.js"></script>
+        <script src="uploader-min.js"></script>
+        <script type="text/javascript">
+            $.ready(function(){
+                var count=0;
+                var uploader=new AjaxUploader('#uploader',{
+                    param:{test:'This is a parameter'},//upload param
+                    action: "/upload",//submit action
+                    onSubmit:function(){
+                        alert('onSubmit');
+                    },//on submit listener
+                    onComplete:function(dom){
+                        alert('onComplete:'+dom);
+                    }//on complete listener
+                });
+                uploader.addFile('file'+(count++));
+                $('<button>Add</button>').click(function(){
+                    uploader.addFile('file'+(count++));
+                }).appendTo('#buttons');
+                $('<button>Reset</button>').click(function(){
+                    uploader.removeAllFile();
+                    uploader.addFile('file'+(count++));
+                }).appendTo('#buttons');
+                $('<button>Upload</button>').click(function(){
+                    uploader.submit();
+                }).appendTo('#buttons');
+            });
+        </script>
+    </body>
+</html>
