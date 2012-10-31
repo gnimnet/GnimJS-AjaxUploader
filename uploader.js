@@ -1,9 +1,9 @@
 /*
  *  This JavaScript file for Ajax Upload JavaScript component
  *  this component works for GnimJS
- *  Version 0.1.0
+ *  Version 0.1.1
  *  Write by Ming
- *  Date 2010.12.28
+ *  Date 2012.10.31
  */
 (function($,NULL,UNDEFINED){
     /* private static variables for AjaxUploader */
@@ -44,7 +44,7 @@
         uploading:false,//uploading flag
         _files:NULL,//file name & id pool
         _iframe:NULL,//current iframe id
-        _selector:NULL//container selector
+        _$dom:NULL//container dom
     };
     /* public & private functions for AjaxUploader */
     AjaxUploader.prototype={
@@ -56,19 +56,17 @@
     }
     /**
      * constructor of AjaxUploader
-     * @param conSelector AjaxUploader container selector
+     * @param con AjaxUploader container selector or item
      * @param config AjaxUploader init param
      */
-    function AjaxUploader(conSelector,config){
+    function AjaxUploader(con,config){
         var objThis=this;
         //create public & private variable
         for(var name in _vars){
             objThis[name]=_vars[name];
         }
-        objThis._selector=conSelector;
-        objThis._files={};
         //init AjaxUploader DOM
-        var $con=$(conSelector);
+        var $con=$(con);
         if($con.length!=1){
             throw new Error('selector should find only one element');
         }
@@ -76,7 +74,9 @@
         $('<form encType="multipart/form-data" method="post" class="'+_CLASS_FORM+'">'+
             '<div class="'+_CLASS_INPUT_CON+'"></div>'+
             '<div class="'+_CLASS_IFRAME_CON+'"></div>'+
-            '</form>').appendTo(conSelector);
+            '</form>').appendTo($con);
+        objThis._$dom=$con;
+        objThis._files={};
         objThis[_CONFIG_PARAM]={};
         if(!_isNullOrUndefined(config)){
             objThis.setConfig(config);
@@ -113,7 +113,7 @@
         var autoid=_INPUT_AUTO_ID_PREFIX+(_input_autoid++);
         objThis._files[name]=autoid;
         $('<input name="'+name+'" class="'+_CLASS_INPUT+' '+autoid+'" type="file" multiple />')
-            .appendTo(objThis._selector+'.'+_CLASS_INPUT_CON);
+            .appendTo(objThis._$dom.find('.'+_CLASS_INPUT_CON));
     }
     /**
      * remove file input by name
@@ -121,7 +121,7 @@
     function removeFile(name){
         var objThis=this;
         if(!_isNullOrUndefined(objThis._files[name])){
-            $(objThis._selector+'.'+objThis._files[name]).remove();
+            objThis._$dom.find('.'+objThis._files[name]).remove();
             delete objThis._files[name];
         }
     }
@@ -149,16 +149,16 @@
         $('<iframe id="'+autoid+'" name="'+autoid+'" class="'+_CLASS_IFRAME+'" src="'+_EMPTY_IFRAME_URL+'" style="display:none;"></iframe>')
             .load(function(){
                 if(objThis.uploading){
-                    var iframe=$(objThis._selector+'.'+_CLASS_IFRAME)[0];
+                    var iframe=objThis._$dom.find('.'+_CLASS_IFRAME)[0];
                     var doc = iframe.contentDocument ? iframe.contentDocument : document.frames[autoid].document;
                     if(objThis[_CONFIG_ON_COMPLETE]){
                         objThis[_CONFIG_ON_COMPLETE](doc.body.innerHTML);//call onComplete() function
                     }
                     objThis.uploading=false;
                 }
-            }).appendTo($(objThis._selector+'.'+_CLASS_IFRAME_CON).empty());
+            }).appendTo(objThis._$dom.find('.'+_CLASS_IFRAME_CON).empty());
         //set form target & action
-        var form=$(objThis._selector+'.'+_CLASS_FORM)[0];
+        var form=objThis._$dom.find('.'+_CLASS_FORM)[0];
         form.target=autoid;
         var action=objThis[_CONFIG_ACTION];
         var start=action.indexOf("?")>0;
