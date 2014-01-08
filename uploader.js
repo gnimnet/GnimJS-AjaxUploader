@@ -1,9 +1,9 @@
 /*
  *  This JavaScript file for Ajax Upload JavaScript component
  *  this component works for GnimJS
- *  Version 0.1.1
+ *  Version 0.1.2
  *  Write by Ming
- *  Date 2012.10.31
+ *  Date 2014.01.08
  */
 (function($,NULL,UNDEFINED){
     /* private static variables for AjaxUploader */
@@ -106,13 +106,14 @@
     /**
      * add a file input by name
      * @param name file input name field value
+     * @param multiple allow multiple files
      */
-    function addFile(name){
+    function addFile(name,multiple){
         var objThis=this;
         objThis.removeFile(name);
         var autoid=_INPUT_AUTO_ID_PREFIX+(_input_autoid++);
         objThis._files[name]=autoid;
-        $('<input name="'+name+'" class="'+_CLASS_INPUT+' '+autoid+'" type="file" multiple />')
+        $('<input name="'+name+'" class="'+_CLASS_INPUT+' '+autoid+'" type="file"'+(multiple?' multiple':'')+' />')
             .appendTo(objThis._$dom.find('.'+_CLASS_INPUT_CON));
     }
     /**
@@ -152,7 +153,7 @@
                     var iframe=objThis._$dom.find('.'+_CLASS_IFRAME)[0];
                     var doc = iframe.contentDocument ? iframe.contentDocument : document.frames[autoid].document;
                     if(objThis[_CONFIG_ON_COMPLETE]){
-                        objThis[_CONFIG_ON_COMPLETE](doc.body.innerHTML);//call onComplete() function
+                        objThis[_CONFIG_ON_COMPLETE]($(doc.body).text());//call onComplete() function
                     }
                     objThis.uploading=false;
                 }
